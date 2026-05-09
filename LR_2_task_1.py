@@ -5,10 +5,8 @@ from sklearn.multiclass import OneVsOneClassifier
 from sklearn.model_selection import train_test_split, cross_val_score
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 
-# Вхідний файл
 input_file = 'income_data.txt'
 
-# Читання даних
 X = []
 count_class1 = 0
 count_class2 = 0
@@ -31,10 +29,9 @@ with open(input_file, 'r', encoding='utf-8') as f:
             X.append(data)
             count_class2 += 1
 
-# Перетворення в масив numpy
+
 X = np.array(X)
 
-# Кодування рядкових даних
 label_encoders = {}
 X_encoded = np.empty(X.shape, dtype=object)
 
@@ -46,23 +43,22 @@ for i in range(X.shape[1]):
         X_encoded[:, i] = le.fit_transform(X[:, i])
         label_encoders[i] = le
 
-# Останній стовпець - це мітка класу
+
 X_final = X_encoded[:, :-1].astype(int)
 y = X_encoded[:, -1].astype(int)
 
-# Розбиття 80/20
+
 X_train, X_test, y_train, y_test = train_test_split(
     X_final, y, test_size=0.2, random_state=5
 )
 
-# Класифікатор
+
 classifier = OneVsOneClassifier(LinearSVC(random_state=0, max_iter=5000))
 classifier.fit(X_train, y_train)
 
-# Прогноз
 y_test_pred = classifier.predict(X_test)
 
-# Метрики
+
 accuracy = accuracy_score(y_test, y_test_pred)
 precision = precision_score(y_test, y_test_pred, average='weighted')
 recall = recall_score(y_test, y_test_pred, average='weighted')
@@ -73,14 +69,13 @@ print("Precision:", round(precision * 100, 2), "%")
 print("Recall:", round(recall * 100, 2), "%")
 print("F1:", round(f1 * 100, 2), "%")
 
-# Крос-валідація для F1
+
 cv_f1 = cross_val_score(
     OneVsOneClassifier(LinearSVC(random_state=0, max_iter=5000)),
     X_final, y, scoring='f1_weighted', cv=3
 )
 print("Cross-val F1:", round(cv_f1.mean() * 100, 2), "%")
 
-# Тестова точка
 input_data = [
     '37', 'Private', '215646', 'HS-grad', '9', 'Never-married',
     'Handlers-cleaners', 'Not-in-family', 'White', 'Male',
